@@ -90,17 +90,20 @@ extension Person {
         }
         
         var id: UUID?
+        
+        func verify(using signer: JWTSigner) throws {
+        }
     }
 }
 
 //extension Person: ModelAuthenticatable {
 //    static let usernameKey = \Person.$email
-//    static let passwordKey = \Person.$password
+//    static let passwordHashKey = \Person.$password
 //    
 //    func verify(password: String) throws -> Bool {
 //        try Bcrypt.verify(password, created: self.password)
 //    }
-}
+//}
 
 extension Person.NewPerson: Validatable {
     static func validations(_ validations: inout Validations) {
