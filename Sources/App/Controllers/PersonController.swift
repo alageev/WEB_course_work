@@ -49,8 +49,7 @@ struct PersonController: RouteCollection {
 
     func login(req: Request) throws -> EventLoopFuture<[String: String]> {
         let oldPerson = try req.content.decode(Person.OldPerson.self)
-        return Person.query(on: req.db).filter(\.$email == oldPerson.email).first().map { person in
-
+        return Person.query(on: req.db).filter(\.$email == oldPerson.email.lowercased()).first().map { person in
             if let person = person {
                 if try! Bcrypt.verify(oldPerson.password, created: person.password) {
                     return ["token": try! req.jwt.sign(Person.JWT(from: person))]

@@ -44,7 +44,7 @@ final class Person: Model, Content, Authenticatable {
          imageLink: String? = nil) {
         
         self.id = id
-        self.email = email
+        self.email = email.lowercased()
         self.name = name
         self.lastname = lastname
         self.nickname = nickname
@@ -54,7 +54,7 @@ final class Person: Model, Content, Authenticatable {
     
     init(from newPerson: Person.NewPerson){
         self.id = UUID()
-        self.email = newPerson.email
+        self.email = newPerson.email.lowercased()
         self.name = newPerson.name
         self.lastname = newPerson.lastname
         self.nickname = newPerson.nickname
@@ -90,19 +90,16 @@ extension Person {
         }
         
         var id: UUID?
-        
-        func verify(using signer: JWTSigner) throws {
-        }
     }
 }
 
-extension Person: ModelAuthenticatable {
-    static let usernameKey = \Person.$email
-    static let passwordHashKey = \Person.$password
-    
-    func verify(password: String) throws -> Bool {
-        try Bcrypt.verify(password, created: self.password)
-    }
+//extension Person: ModelAuthenticatable {
+//    static let usernameKey = \Person.$email
+//    static let passwordKey = \Person.$password
+//    
+//    func verify(password: String) throws -> Bool {
+//        try Bcrypt.verify(password, created: self.password)
+//    }
 }
 
 extension Person.NewPerson: Validatable {
