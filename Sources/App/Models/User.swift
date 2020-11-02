@@ -1,5 +1,5 @@
 //
-//  Person.swift
+//  User.swift
 //
 //
 //  Created by Алексей Агеев on 21.10.2020.
@@ -9,7 +9,7 @@ import Fluent
 import Vapor
 import JWT
 
-final class Person: Model, Content, Authenticatable {
+final class User: Model, Content, Authenticatable {
     static let schema = "people"
     
     @ID(key: .id)
@@ -52,7 +52,7 @@ final class Person: Model, Content, Authenticatable {
         self.imageLink = imageLink
     }
     
-    init(from newPerson: Person.NewPerson){
+    init(from newPerson: User.NewUser){
         self.id = UUID()
         self.email = newPerson.email.lowercased()
         self.name = newPerson.name
@@ -63,9 +63,9 @@ final class Person: Model, Content, Authenticatable {
     }
 }
 
-extension Person {
+extension User {
     
-    struct NewPerson: Content {
+    struct NewUser: Content {
         let email: String
         let name: String
         let lastname: String
@@ -75,13 +75,13 @@ extension Person {
         let imageLink: String?
     }
     
-    struct OldPerson: Content {
+    struct OldUser: Content {
         let email: String
         let password: String
     }
     
     struct JWT: Content, Authenticatable, JWTPayload {
-        init(from person: Person){
+        init(from person: User){
             self.id = person.id
         }
         
@@ -96,16 +96,16 @@ extension Person {
     }
 }
 
-//extension Person: ModelAuthenticatable {
-//    static let usernameKey = \Person.$email
-//    static let passwordHashKey = \Person.$password
+//extension User: ModelAuthenticatable {
+//    static let usernameKey = \User.$email
+//    static let passwordHashKey = \User.$password
 //    
 //    func verify(password: String) throws -> Bool {
 //        try Bcrypt.verify(password, created: self.password)
 //    }
 //}
 
-extension Person.NewPerson: Validatable {
+extension User.NewUser: Validatable {
     static func validations(_ validations: inout Validations) {
         validations.add("name", as: String.self, is: !.empty)
         validations.add("email", as: String.self, is: .email)
@@ -113,7 +113,7 @@ extension Person.NewPerson: Validatable {
     }
 }
 
-extension Person.OldPerson: Validatable {
+extension User.OldUser: Validatable {
     static func validations(_ validations: inout Validations) {
         validations.add("email", as: String.self, is: .email)
     }
