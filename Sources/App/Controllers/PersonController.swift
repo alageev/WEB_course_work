@@ -29,13 +29,13 @@ struct PersonController: RouteCollection {
 //        return User.query(on: req.db).all()
 //    }
     
-    func selfUser(req: Request) throws -> EventLoopFuture<User> {
+    func selfUser(req: Request) throws -> EventLoopFuture<[User]> {
         guard let userID = try req.jwt.verify(as: User.JWT.self).id else {
             throw Abort(.imATeapot)
         }
         return User.find(userID, on: req.db).unwrap(or: Abort(.imATeapot)).map { user in
             user.password = ""
-            return user
+            return [user]
         }
     }
     
