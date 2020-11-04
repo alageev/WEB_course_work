@@ -30,8 +30,8 @@ final class User: Model, Content, Authenticatable {
     @Field(key: "password")
     var password: String
     
-    @OptionalField(key: "image_link")
-    var imageLink: String?
+//    @OptionalField(key: "image_link")
+//    var imageLink: String?
 
     init() {}
 
@@ -41,7 +41,8 @@ final class User: Model, Content, Authenticatable {
          lastname:  String,
          nickname:  String,
          password:  String,
-         imageLink: String? = nil) {
+//         imageLink: String? = nil
+    ) {
         
         self.id = id
         self.email = email.lowercased()
@@ -49,30 +50,31 @@ final class User: Model, Content, Authenticatable {
         self.lastname = lastname
         self.nickname = nickname
         self.password = password
-        self.imageLink = imageLink
+//        self.imageLink = imageLink
     }
     
-    init(from newPerson: User.NewUser){
-        self.id = UUID()
-        self.email = newPerson.email.lowercased()
-        self.name = newPerson.name
-        self.lastname = newPerson.lastname
-        self.nickname = newPerson.nickname
-        self.password = try! Bcrypt.hash(newPerson.password)
-        self.imageLink = newPerson.imageLink
+    init(from newUser: User.NewUser){
+        self.id = newUser.id
+        self.email = newUser.email.lowercased()
+        self.name = newUser.name
+        self.lastname = newUser.lastname
+        self.nickname = newUser.nickname
+        self.password = try! Bcrypt.hash(newUser.password)
+//        self.imageLink = newUser.imageLink
     }
 }
 
 extension User {
     
     struct NewUser: Content {
+        let id: UUID
         let email: String
         let name: String
         let lastname: String
         let nickname: String
         let password: String
         let confirmPassword: String
-        let imageLink: String?
+//        let imageLink: String?
     }
     
     struct OldUser: Content {

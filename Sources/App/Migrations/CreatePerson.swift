@@ -16,7 +16,7 @@ struct CreatePerson: Migration {
             .field("lastname", .string, .required)
             .field("nickname", .string, .required)
             .field("password", .string, .required)
-            .field("image_link", .string)
+//            .field("image_link", .string)
             .unique(on: "email", name: "no_duplicate_emails")
             .create()
     }
