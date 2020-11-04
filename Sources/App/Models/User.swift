@@ -40,7 +40,7 @@ final class User: Model, Content, Authenticatable {
          name:      String,
          lastname:  String,
          nickname:  String,
-         password:  String,
+         password:  String//,
 //         imageLink: String? = nil
     ) {
         
