@@ -10,16 +10,47 @@ import Vapor
 
 struct PostController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        let posts = routes.grouped("post")
+        let posts = routes.grouped("post").grouped(User.JWT.authenticator())
         posts.get(use: getAll)
+        posts.get("my", use: getUserPosts)
         posts.post(use: addNew)
         posts.group(":postID") { post in
+            post.get(use: getPost)
             post.delete(use: delete)
         }
     }
     
     func getAll(req: Request) throws -> EventLoopFuture<[Post]> {
-        return Post.query(on: req.db).filter(\.$replyTo == nil).all()
+        Post.query(on: req.db).with(\.$author).all().map { posts -> [Post] in
+            for post in posts {
+                post.author.password = ""
+            }
+            return posts
+        }
+    }
+    
+    func getUserPosts(req: Request) throws -> EventLoopFuture<[Post]> {
+        if let uuid = (try req.auth.require(User.JWT.self)).id {
+            return Post.query(on: req.db)
+                .with(\.$author)
+                .all()
+                .map { posts -> [Post] in
+                    var userPosts: [Post] = []
+                    for post in posts {
+                        if post.$author.id == uuid && post.replyTo == nil {
+                            post.author.password = ""
+                            userPosts.append(post)
+                        }
+                    }
+                    return userPosts
+                }
+        } else {
+            throw Abort(.unauthorized)
+        }
+    }
+    
+    func getPost(req: Request) throws -> EventLoopFuture<[Post]> {
+        Post.query(on: req.db).with(\.$author).all()
     }
     
     func addNew(req: Request) throws -> EventLoopFuture<Post> {

@@ -10,7 +10,7 @@ import Vapor
 import JWT
 
 final class User: Model, Content, Authenticatable {
-    static let schema = "people"
+    static let schema = "users"
     
     @ID(key: .id)
     var id: UUID?
@@ -30,8 +30,8 @@ final class User: Model, Content, Authenticatable {
     @Field(key: "password")
     var password: String
     
-//    @OptionalField(key: "image_link")
-//    var imageLink: String?
+    @Children(for: \.$author)
+    var posts: [Post]
 
     init() {}
 
@@ -40,33 +40,29 @@ final class User: Model, Content, Authenticatable {
          name:      String,
          lastname:  String,
          nickname:  String,
-         password:  String//,
-//         imageLink: String? = nil
+         password:  String
     ) {
-        
         self.id = id
         self.email = email.lowercased()
         self.name = name
         self.lastname = lastname
         self.nickname = nickname
         self.password = password
-//        self.imageLink = imageLink
     }
     
-    init(from newUser: User.NewUser){
+    init(from newUser: User.Create){
         self.id = newUser.id
         self.email = newUser.email.lowercased()
         self.name = newUser.name
         self.lastname = newUser.lastname
         self.nickname = newUser.nickname
         self.password = try! Bcrypt.hash(newUser.password)
-//        self.imageLink = newUser.imageLink
     }
 }
 
 extension User {
     
-    struct NewUser: Content {
+    struct Create: Content {
         let id: UUID
         let email: String
         let name: String
@@ -74,17 +70,20 @@ extension User {
         let nickname: String
         let password: String
         let confirmPassword: String
-//        let imageLink: String?
     }
     
-    struct OldUser: Content {
+    struct Check: Content {
         let email: String
         let password: String
     }
     
     struct JWT: Content, Authenticatable, JWTPayload {
-        init(from person: User){
-            self.id = person.id
+        init(from user: User){
+            self.id = user.id
+        }
+        
+        init(from user: User.Create){
+            self.id = user.id
         }
         
         enum CodingKeys: String, CodingKey {
@@ -94,20 +93,12 @@ extension User {
         var id: UUID?
         
         func verify(using signer: JWTSigner) throws {
+            
         }
     }
 }
 
-//extension User: ModelAuthenticatable {
-//    static let usernameKey = \User.$email
-//    static let passwordHashKey = \User.$password
-//    
-//    func verify(password: String) throws -> Bool {
-//        try Bcrypt.verify(password, created: self.password)
-//    }
-//}
-
-extension User.NewUser: Validatable {
+extension User.Create: Validatable {
     static func validations(_ validations: inout Validations) {
         validations.add("name", as: String.self, is: !.empty)
         validations.add("email", as: String.self, is: .email)
@@ -115,8 +106,8 @@ extension User.NewUser: Validatable {
     }
 }
 
-extension User.OldUser: Validatable {
-    static func validations(_ validations: inout Validations) {
-        validations.add("email", as: String.self, is: .email)
-    }
-}
+//extension User.Check: Validatable {
+//    static func validations(_ validations: inout Validations) {
+//        validations.add("email", as: String.self, is: .email)
+//    }
+//}

@@ -2,6 +2,6 @@ import Fluent
 import Vapor
 
 func routes(_ app: Application) throws {
-    try app.register(collection: PersonController())
+    try app.register(collection: UserController())
     try app.register(collection: PostController())
 }

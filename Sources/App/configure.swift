@@ -18,7 +18,7 @@ public func configure(_ app: Application) throws {
         tlsConfiguration: .forClient(certificateVerification: .none)
     ), as: .psql)
 
-    app.migrations.add(CreatePerson())
+    app.migrations.add(CreateUser())
     app.migrations.add(CreatePost())
 
     // register routes
