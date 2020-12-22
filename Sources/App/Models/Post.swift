@@ -58,3 +58,10 @@ final class Post: Model, Content {
 //        self.numberOfDislikes = numberOfDislikes
     }
 }
+
+struct UserPost: Decodable {
+    let id: String
+    let authorId: String
+    let header: String
+    let text: String
+}

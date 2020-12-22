@@ -54,7 +54,11 @@ struct PostController: RouteCollection {
     }
     
     func addNew(req: Request) throws -> EventLoopFuture<Post> {
-        let post = try req.content.decode(Post.self)
+        let loadedPost = try req.content.decode(UserPost.self)
+        let post = Post(id: UUID(uuidString: loadedPost.id)!,
+                        author: UUID(uuidString: loadedPost.authorId)!,
+                        header: loadedPost.header,
+                        text: loadedPost.text)
         return post.save(on: req.db).map { post }
     }
     
