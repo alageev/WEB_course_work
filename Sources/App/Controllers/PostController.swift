@@ -30,23 +30,23 @@ struct PostController: RouteCollection {
     }
     
     func getUserPosts(req: Request) throws -> EventLoopFuture<[Post]> {
-        if let uuid = (try req.auth.require(User.JWT.self)).id {
-            return Post.query(on: req.db)
-                .with(\.$author)
-                .all()
-                .map { posts -> [Post] in
-                    var userPosts: [Post] = []
-                    for post in posts {
-                        if post.$author.id == uuid && post.replyTo == nil {
-                            post.author.password = ""
-                            userPosts.append(post)
-                        }
-                    }
-                    return userPosts
-                }
-        } else {
+        guard let uuid = (try req.auth.require(User.JWT.self)).id else {
             throw Abort(.unauthorized)
         }
+        
+        return Post.query(on: req.db)
+            .with(\.$author)
+            .all()
+            .map { posts -> [Post] in
+                var userPosts: [Post] = []
+                for post in posts {
+                    if post.$author.id == uuid {
+                        post.author.password = ""
+                        userPosts.append(post)
+                    }
+                }
+                return userPosts
+            }
     }
     
     func getPost(req: Request) throws -> EventLoopFuture<[Post]> {

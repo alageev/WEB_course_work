@@ -17,43 +17,44 @@ final class Post: Model, Content {
     @Parent(key: "author")
     var author: User
     
-    @OptionalParent(key: "reply_to")
-    var replyTo: Post?
+//    @OptionalParent(key: "reply_to")
+//    var replyTo: Post?
     
-    @Children(for: \.$replyTo)
-    var replies: [Post]
+//    @Children(for: \.$replyTo)
+//    var replies: [Post]
     
-    @OptionalField(key: "header")
+    @Field(key: "header")
     var header: String?
     
     @Field(key: "text")
     var text: String
     
-    @Timestamp(key: "created_at", on: .create)
-    var createdAt: Date?
-    
-    @Field(key: "number_of_likes")
-    var numberOfLikes: Int64
-    
-    @Field(key: "number_of_dislikes")
-    var numberOfDislikes: Int64
+//    @Timestamp(key: "created_at", on: .create)
+//    var createdAt: Date?
+//
+//    @Field(key: "number_of_likes")
+//    var numberOfLikes: Int64
+//
+//    @Field(key: "number_of_dislikes")
+//    var numberOfDislikes: Int64
     
     init() {}
     
-    init(id:               UUID?   = nil,
+    init(id:               UUID,
          author:           UUID,
-         replyTo:          UUID,
-         header:           String? = nil,
-         text:             String,
-         numberOfLikes:    Int64  = 0,
-         numberOfDislikes: Int64  = 0) {
+//         replyTo:          UUID?   = nil,
+         header:           String,
+         text:             String//,
+//         numberOfLikes:    Int64  = 0,
+//         numberOfDislikes: Int64  = 0
+    ) {
         
         self.id = id
         self.$author.id = author
 //        self.$replyTo.id = replyTo
         self.header = header
         self.text = text
-        self.numberOfLikes = numberOfLikes
-        self.numberOfDislikes = numberOfDislikes
+//        self.numberOfLikes = numberOfLikes
+//        self.numberOfDislikes = numberOfDislikes
     }
 }

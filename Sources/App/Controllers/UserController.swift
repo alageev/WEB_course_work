@@ -21,7 +21,7 @@ struct UserController: RouteCollection {
         secure.group(":userID") { users in
 //            users.get("posts", use: posts)//user's posts
             users.get(use: getOne)
-            users.delete(use: delete)
+//            users.delete(use: delete)
         }
     }
 
@@ -85,25 +85,28 @@ struct UserController: RouteCollection {
         } catch {
             throw Abort(.notAcceptable, reason: "Cannot decode data")
         }
+        
         return User.query(on: req.db)
             .filter(\.$email == check.email.lowercased())
             .first()
             .unwrap(or: Abort(.badRequest, reason: "User not found"))
             .flatMapThrowing { user -> [String: String] in
                 var passwordIsCorrect: Bool
+                
                 do {
                     passwordIsCorrect = try Bcrypt.verify(check.password, created: user.password)
                 } catch {
                     throw Abort(.internalServerError, reason: "Cannot calculate hash")
                 }
-                if passwordIsCorrect {
-                    do {
-                        return ["token": try req.jwt.sign(User.JWT(from: user))]
-                    } catch {
-                        throw Abort(.internalServerError, reason: "Cannot sign jwt")
-                    }
-                } else {
+                
+                guard passwordIsCorrect else {
                     throw Abort(.unauthorized, reason: "Incorrect password")
+                }
+                
+                do {
+                    return ["token": try req.jwt.sign(User.JWT(from: user))]
+                } catch {
+                    throw Abort(.internalServerError, reason: "Cannot sign jwt")
                 }
         }
     }
@@ -122,11 +125,11 @@ struct UserController: RouteCollection {
 //        throw Abort(.badRequest, reason: "User not found")
 //    }
     
-    func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        return User.find(req.parameters.get("personID"), on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .flatMap { $0.delete(on: req.db) }
-            .transform(to: .ok)
-    }
+//    func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {
+//        return User.find(req.parameters.get("personID"), on: req.db)
+//            .unwrap(or: Abort(.notFound))
+//            .flatMap { $0.delete(on: req.db) }
+//            .transform(to: .ok)
+//    }
 }
 
