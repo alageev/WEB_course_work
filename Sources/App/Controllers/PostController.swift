@@ -30,7 +30,7 @@ struct PostController: RouteCollection {
     }
     
     func getUserPosts(req: Request) throws -> EventLoopFuture<[Post]> {
-        guard let uuid = (try req.auth.require(User.JWT.self)).id else {
+        guard let uuid = (try req.auth.require(User.JWT.self)).token else {
             throw Abort(.unauthorized)
         }
         
@@ -55,10 +55,12 @@ struct PostController: RouteCollection {
     
     func addNew(req: Request) throws -> EventLoopFuture<Post> {
         let loadedPost = try req.content.decode(UserPost.self)
+        
         let post = Post(id: UUID(uuidString: loadedPost.id)!,
                         author: UUID(uuidString: loadedPost.authorId)!,
                         header: loadedPost.header,
                         text: loadedPost.text)
+        
         return post.save(on: req.db).map { post }
     }
     

@@ -30,7 +30,7 @@ struct UserController: RouteCollection {
 //    }
     
     func selfUser(req: Request) throws -> EventLoopFuture<User> {
-        guard let userID = try req.jwt.verify(as: User.JWT.self).id else {
+        guard let userID = try req.jwt.verify(as: User.JWT.self).token else {
             throw Abort(.imATeapot)
         }
         return User.find(userID, on: req.db).unwrap(or: Abort(.imATeapot)).map { user in
@@ -69,7 +69,14 @@ struct UserController: RouteCollection {
         
         return user.save(on: req.db).flatMapThrowing {
             do {
-                return ["token": try req.jwt.sign(User.JWT(from: user))]
+                return [
+                    "token": try req.jwt.sign(User.JWT(from: user)),
+                    "id": user.id!.uuidString,
+                    "email": user.email,
+                    "name": user.name,
+                    "lastname": user.lastname,
+                    "nickname": user.nickname
+                ]
             } catch {
                 throw Abort(.internalServerError)
             }
@@ -104,7 +111,14 @@ struct UserController: RouteCollection {
                 }
                 
                 do {
-                    return ["token": try req.jwt.sign(User.JWT(from: user))]
+                    return [
+                        "token": try req.jwt.sign(User.JWT(from: user)),
+                        "id": user.id!.uuidString,
+                        "email": user.email,
+                        "name": user.name,
+                        "lastname": user.lastname,
+                        "nickname": user.nickname
+                    ]
                 } catch {
                     throw Abort(.internalServerError, reason: "Cannot sign jwt")
                 }

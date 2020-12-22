@@ -80,17 +80,30 @@ extension User {
     struct JWT: Content, Authenticatable, JWTPayload {
         init(from user: User){
             self.id = user.id
+            self.email = user.email
+            self.name = user.name
+            self.lastname = user.lastname
+            self.nickname = user.nickname
         }
         
         init(from user: User.Create){
             self.id = user.id
+            self.email = user.email
+            self.name = user.name
+            self.lastname = user.lastname
+            self.nickname = user.nickname
         }
         
-        enum CodingKeys: String, CodingKey {
-            case id = "id"
-        }
+//        enum CodingKeys: String, CodingKey {
+//            case id = "id"
+//        }
         
+        var token: UUID?
         var id: UUID?
+        var email: String
+        var name: String
+        var lastname: String
+        var nickname: String
         
         func verify(using signer: JWTSigner) throws {
             
@@ -105,9 +118,3 @@ extension User.Create: Validatable {
         validations.add("password", as: String.self, is: .count(8...))
     }
 }
-
-//extension User.Check: Validatable {
-//    static func validations(_ validations: inout Validations) {
-//        validations.add("email", as: String.self, is: .email)
-//    }
-//}
